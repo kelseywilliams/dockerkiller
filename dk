@@ -4,7 +4,7 @@ if [ -z "${1}" ]; then
     echo "No target found."
     exit 1
 fi
-
+echo "Run a docker ps -a first to be sure! I'm crazy man, I'll kill everybody."
 target=$1
 cnt=$(docker ps -a | awk '/'$target'/ {print $1}')
 img=$(docker images | awk '/'$target'/ {print $3}')
