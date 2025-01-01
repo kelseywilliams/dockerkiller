@@ -1,0 +1,52 @@
+#!/bin/bash
+if [ -z "${1}" ]; then
+    echo "Usage: $0 <target-pattern>"
+    echo "No target found."
+    exit 1
+fi
+
+target=$1
+cnt=$(docker ps -a | awk '/'$target'/ {print $1}')
+img=$(docker images | awk '/'$target'/ {print $3}')
+
+if [ -z "$cnt" ]; then
+    echo "No containers found for '$target'"
+else
+    echo "Containers found for '$target':"
+    IFS=$'\n' read -r -d '' -a cnts <<< "$cnt"
+    for id in "${cnts[@]}"; do
+        echo "  - $id"
+    done
+    read -p "Destroy? [y/n]" ans
+    if [[ "$ans" =~ ^[Yy]$ ]]; then
+        echo "Stopping and removing containers..."
+        for id in "${cnts[@]}"; do
+            docker stop "$id"
+            docker rm "$id"
+        done
+        echo "Done."
+    else
+        echo "Aborting."
+        exit 0
+    fi
+fi
+if [ -z "$img" ]; then
+    echo "No images found for '$target'"
+else
+    echo "Images found for '$target':"
+    IFS=$'\n' read -r -d '' -a imgs <<< "$img"
+    for id in "${imgs[@]}"; do
+        echo "  - $id"
+    done
+    read -p "Remove? [y/n]" ans
+    if [[ "$ans" =~ ^[Yy]$ ]]; then
+        echo "Removing images..."
+        for id in "${imgs[@]}"; do
+            docker rmi "$id"
+        done
+        echo "Done."
+    else
+        echo "Aborting."
+        exit 0
+    fi
+fi
