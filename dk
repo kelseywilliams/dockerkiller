@@ -27,7 +27,7 @@ else
         echo "Done."
     else
         echo "Aborting."
-        exit 0
+        # Continue to images
     fi
 fi
 if [ -z "$img" ]; then
